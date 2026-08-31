@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Sábado - Fernanda & Angelo</title>
+    <style>
+        :root {
+            --bg-color: #0f1115;
+            --card-bg: #1c1f26;
+            --text-main: #f0f0f0;
+            --text-muted: #a0a5b1;
+            --accent: #e50914;
+            --accent-hover: #b20710;
+            --winner-color: #28a745;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 { margin-top: 0; font-size: 28px; color: #fff; letter-spacing: 1px; }
+        p { color: var(--text-muted); margin-bottom: 30px; font-size: 15px; }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 400px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+            margin-bottom: 10px;
+        }
+
+        button:hover:not(:disabled) { 
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6);
+        }
+        
+        button:disabled { 
+            background-color: #333; 
+            color: #777; 
+            cursor: wait;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .batalha-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .card-filme {
+            background-color: #15171c;
+            border: 1px solid #2a2d35;
+            border-radius: 12px;
+            padding: 20px;
+            width: 50%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        .card-filme.visible {
+            display: flex;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .card-filme.winner {
+            border-color: var(--winner-color);
+            box-shadow: 0 0 20px rgba(40, 167, 69, 0.3);
+            transform: scale(1.02);
+        }
+
+        .card-filme.loser {
+            opacity: 0.4;
+            filter: grayscale(80%);
+            transform: scale(0.95);
+        }
+
+        .badge {
+            background-color: #333;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .card-filme.winner .badge { background-color: var(--winner-color); }
+
+        .poster {
+            width: 140px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+        }
+
+        .info-diretor {
+            font-size: 12px;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .info-titulo { font-size: 18px; font-weight: bold; margin: 0 0 5px 0; color: #fff; }
+        .info-ano { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+        
+        .info-sinopse {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #ccc;
+            overflow-y: auto;
+            max-height: 100px;
+            padding: 0 5px;
+            text-align: justify;
+        }
+
+        .info-sinopse::-webkit-scrollbar { width: 4px; }
+        .info-sinopse::-webkit-scrollbar-thumb { background-color: #444; border-radius: 10px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .batalha-container { flex-direction: column; }
+            .card-filme { width: 100%; box-sizing: border-box; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>O que vamos assistir hoje? 🍿</h1>
+        <p>Cada um gira a roleta uma vez.</p>
+        
+        <button id="btn-acao" onclick="executarAcao()">Fernanda: Girar Roleta</button>
+
+        <div class="batalha-container">
+            <div id="card-1" class="card-filme">
+                <div class="badge" id="badge-1">Opção da Fernanda</div>
+                <img id="poster-1" class="poster" src="" alt="Pôster">
+                <div id="diretor-1" class="info-diretor"></div>
+                <h2 id="titulo-1" class="info-titulo"></h2>
+                <div id="ano-1" class="info-ano"></div>
+                <div id="sinopse-1" class="info-sinopse"></div>
+            </div>
+
+            <div id="card-2" class="card-filme">
+                <div class="badge" id="badge-2">Opção do Angelo</div>
+                <img id="poster-2" class="poster" src="" alt="Pôster">
+                <div id="diretor-2" class="info-diretor"></div>
+                <h2 id="titulo-2" class="info-titulo"></h2>
+                <div id="ano-2" class="info-ano"></div>
+                <div id="sinopse-2" class="info-sinopse"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = "49b1eb0bd7ebd05fccec55b65470175c"; 
+        
+        const diretoresIds = [
+            488, 1032, 138, 525, 240, 2636, 1776, 7467, 13742, 21684, 
+            608, 500, 5655, 1124, 11681, 5955, 10828, 116, 110967, 
+            4367, 1748, 1433, 306, 1392, 1126, 109, 2127, 7177
+        ];
+
+        let faseAtual = 1;
+
+        async function buscarFilmeAleatorio() {
+            const diretorId = diretoresIds[Math.floor(Math.random() * diretoresIds.length)];
+            
+            const [dirRes, moviesRes] = await Promise.all([
+                fetch(`https://api.themoviedb.org/3/person/${diretorId}?api_key=${API_KEY}&language=pt-BR`),
+                fetch(`https://api.themoviedb.org/3/person/${diretorId}/movie_credits?api_key=${API_KEY}&language=pt-BR`)
+            ]);
+
+            const dirData = await dirRes.json();
+            const moviesData = await moviesRes.json();
+
+            const filmesDirigidos = moviesData.crew.filter(filme => filme.job === 'Director' && filme.vote_count > 100);
+            
+            if(filmesDirigidos.length === 0) return buscarFilmeAleatorio(); 
+
+            const filmeEscolhido = filmesDirigidos[Math.floor(Math.random() * filmesDirigidos.length)];
+            
+            return {
+                diretorNome: dirData.name,
+                titulo: filmeEscolhido.title || filmeEscolhido.original_title,
+                ano: filmeEscolhido.release_date ? filmeEscolhido.release_date.substring(0, 4) : 'Ano desconhecido',
+                sinopse: filmeEscolhido.overview ? filmeEscolhido.overview : "Sinopse não disponível em português.",
+                posterPath: filmeEscolhido.poster_path ? `https://image.tmdb.org/t/p/w500${filmeEscolhido.poster_path}` : 'https://via.placeholder.com/140x210?text=Sem+Poster'
+            };
+        }
+
+        function preencherCartao(num, dados) {
+            document.getElementById(`poster-${num}`).src = dados.posterPath;
+            document.getElementById(`diretor-${num}`).innerText = `De ${dados.diretorNome}`;
+            document.getElementById(`titulo-${num}`).innerText = dados.titulo;
+            document.getElementById(`ano-${num}`).innerText = dados.ano;
+            document.getElementById(`sinopse-${num}`).innerText = dados.sinopse;
+            
+            const cartao = document.getElementById(`card-${num}`);
+            cartao.classList.add('visible');
+        }
+
+        async function executarAcao() {
+            const btn = document.getElementById('btn-acao');
+
+            if (faseAtual === 1) {
+                btn.disabled = true;
+                btn.innerText = "Sorteando Opção da Fernanda...";
+                
+                try {
+                    const filme1 = await buscarFilmeAleatorio();
+                    setTimeout(() => {
+                        preencherCartao(1, filme1);
+                        btn.innerText = "Angelo: Girar Roleta";
+                        btn.disabled = false;
+                        faseAtual = 2;
+                    }, 1000);
+                } catch (error) {
+                    btn.innerText = "Erro. Tentar Novamente";
+                    btn.disabled = false;
+                }
+
+            } else if (faseAtual === 2) {
+                btn.disabled = true;
+                btn.innerText = "Sorteando Opção do Angelo...";
+                
+                try {
+                    const filme2 = await buscarFilmeAleatorio();
+                    setTimeout(() => {
+                        preencherCartao(2, filme2);
+                        btn.innerText = "O Destino Decide";
+                        btn.disabled = false;
+                        faseAtual = 3;
+                    }, 1000);
+                } catch (error) {
+                    btn.innerText = "Erro. Tentar Novamente";
+                    btn.disabled = false;
+                }
+
+            } else if (faseAtual === 3) {
+                btn.disabled = true;
+                btn.innerText = "Tomando a decisão...";
+
+                setTimeout(() => {
+                    const ganhadorNum = Math.random() > 0.5 ? 1 : 2;
+                    const perdedorNum = ganhadorNum === 1 ? 2 : 1;
+
+                    document.getElementById(`card-${ganhadorNum}`).classList.add('winner');
+                    document.getElementById(`badge-${ganhadorNum}`).innerText = "Vencedor de Hoje";
+                    
+                    document.getElementById(`card-${perdedorNum}`).classList.add('loser');
+                    document.getElementById(`badge-${perdedorNum}`).innerText = "Deixado para trás";
+
+                    btn.innerText = "Começar tudo de novo";
+                    btn.disabled = false;
+                    faseAtual = 4;
+                }, 1500);
+
+            } else if (faseAtual === 4) {
+                document.getElementById('card-1').classList.remove('visible', 'winner', 'loser');
+                document.getElementById('card-2').classList.remove('visible', 'winner', 'loser');
+                document.getElementById('badge-1').innerText = "Opção da Fernanda";
+                document.getElementById('badge-2').innerText = "Opção do Angelo";
+                
+                btn.innerText = "Fernanda: Girar Roleta";
+                faseAtual = 1;
+            }
+        }
+    </script>
+</body>
+</html>
