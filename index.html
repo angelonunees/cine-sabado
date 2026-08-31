@@ -21,11 +21,11 @@
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
+            /* Removido o align-items: center que quebrava o scroll em telas pequenas */
         }
 
         .container {
@@ -36,6 +36,7 @@
             text-align: center;
             max-width: 900px;
             width: 100%;
+            margin: auto; /* Centraliza verticalmente sem quebrar a rolagem */
         }
 
         h1 { margin-top: 0; font-size: 28px; color: #fff; letter-spacing: 1px; }
@@ -119,15 +120,29 @@
             font-weight: bold;
             margin-bottom: 15px;
             text-transform: uppercase;
+            display: inline-block;
         }
 
         .card-filme.winner .badge { background-color: var(--winner-color); }
+
+        /* Novo container para organizar a imagem e os textos */
+        .card-conteudo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
 
         .poster {
             width: 140px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
             margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .card-info {
+            width: 100%;
         }
 
         .info-diretor {
@@ -159,37 +174,67 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* 📱 REGRAS ESPECÍFICAS PARA CELULARES */
         @media (max-width: 768px) {
-            .batalha-container { flex-direction: column; }
-            .card-filme { width: 100%; box-sizing: border-box; }
+            .container { padding: 25px 15px; margin: 20px auto; }
+            h1 { font-size: 24px; }
+            button { font-size: 16px; padding: 14px 20px; }
+            
+            .batalha-container { flex-direction: column; gap: 15px; }
+            .card-filme { width: 100%; box-sizing: border-box; padding: 15px; }
+            
+            /* Deixa a imagem do lado esquerdo e texto na direita para economizar espaço */
+            .card-conteudo {
+                flex-direction: row;
+                align-items: flex-start;
+                text-align: left;
+                gap: 15px;
+            }
+            
+            .poster { width: 90px; margin-bottom: 0; }
+            
+            /* Ajustes finos nos textos para a versão mobile */
+            .info-titulo { font-size: 16px; }
+            .info-diretor { font-size: 11px; }
+            .info-sinopse { font-size: 12px; max-height: 90px; padding: 0; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>O que vamos assistir hoje? 🍿</h1>
-        <p>Cada um gira a roleta uma vez.</p>
+        <h1>O que vamos assistir? 🍿</h1>
+        <p>Cada um gira a roleta uma vez. Se der empate na escolha, o destino decide.</p>
         
         <button id="btn-acao" onclick="executarAcao()">Fernanda: Girar Roleta</button>
 
         <div class="batalha-container">
+            <!-- Cartão 1 -->
             <div id="card-1" class="card-filme">
                 <div class="badge" id="badge-1">Opção da Fernanda</div>
-                <img id="poster-1" class="poster" src="" alt="Pôster">
-                <div id="diretor-1" class="info-diretor"></div>
-                <h2 id="titulo-1" class="info-titulo"></h2>
-                <div id="ano-1" class="info-ano"></div>
-                <div id="sinopse-1" class="info-sinopse"></div>
+                <div class="card-conteudo">
+                    <img id="poster-1" class="poster" src="" alt="Pôster">
+                    <div class="card-info">
+                        <div id="diretor-1" class="info-diretor"></div>
+                        <h2 id="titulo-1" class="info-titulo"></h2>
+                        <div id="ano-1" class="info-ano"></div>
+                        <div id="sinopse-1" class="info-sinopse"></div>
+                    </div>
+                </div>
             </div>
 
+            <!-- Cartão 2 -->
             <div id="card-2" class="card-filme">
                 <div class="badge" id="badge-2">Opção do Angelo</div>
-                <img id="poster-2" class="poster" src="" alt="Pôster">
-                <div id="diretor-2" class="info-diretor"></div>
-                <h2 id="titulo-2" class="info-titulo"></h2>
-                <div id="ano-2" class="info-ano"></div>
-                <div id="sinopse-2" class="info-sinopse"></div>
+                <div class="card-conteudo">
+                    <img id="poster-2" class="poster" src="" alt="Pôster">
+                    <div class="card-info">
+                        <div id="diretor-2" class="info-diretor"></div>
+                        <h2 id="titulo-2" class="info-titulo"></h2>
+                        <div id="ano-2" class="info-ano"></div>
+                        <div id="sinopse-2" class="info-sinopse"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -255,6 +300,12 @@
                         preencherCartao(1, filme1);
                         btn.innerText = "Angelo: Girar Roleta";
                         btn.disabled = false;
+                        
+                        // Rola a página para baixo no celular para focar no novo cartão
+                        if(window.innerWidth <= 768) {
+                            document.getElementById('card-1').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+                        
                         faseAtual = 2;
                     }, 1000);
                 } catch (error) {
@@ -270,8 +321,13 @@
                     const filme2 = await buscarFilmeAleatorio();
                     setTimeout(() => {
                         preencherCartao(2, filme2);
-                        btn.innerText = "O Destino Decide";
+                        btn.innerText = "O Destino Decide (Desempate)";
                         btn.disabled = false;
+                        
+                        if(window.innerWidth <= 768) {
+                            document.getElementById('card-2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+
                         faseAtual = 3;
                     }, 1000);
                 } catch (error) {
@@ -288,7 +344,7 @@
                     const perdedorNum = ganhadorNum === 1 ? 2 : 1;
 
                     document.getElementById(`card-${ganhadorNum}`).classList.add('winner');
-                    document.getElementById(`badge-${ganhadorNum}`).innerText = "Vencedor de Hoje";
+                    document.getElementById(`badge-${ganhadorNum}`).innerText = "Vencedor da Noite";
                     
                     document.getElementById(`card-${perdedorNum}`).classList.add('loser');
                     document.getElementById(`badge-${perdedorNum}`).innerText = "Deixado para trás";
@@ -305,6 +361,7 @@
                 document.getElementById('badge-2').innerText = "Opção do Angelo";
                 
                 btn.innerText = "Fernanda: Girar Roleta";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 faseAtual = 1;
             }
         }
